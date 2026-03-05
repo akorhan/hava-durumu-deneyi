@@ -22,18 +22,27 @@ pipeline {
             }
         }
 
-        stage('Push') {
-            steps {
-                sh '''
-                    git config user.email "jenkins@ci"
-                    git config user.name "Jenkins"
-                    git add -A
-                    git diff --cached --quiet || git commit -m "ci: automated build [skip ci]"
-                    git push origin HEAD:master
-                '''
-            }
+stage('Push') {
+    steps {
+        // 'github-token' senin Jenkins'e eklediğin credential ID'si olmalı
+        withCredentials([usernamePassword(credentialsId: 'github-token', 
+                         passwordVariable: 'GIT_PASSWORD', 
+                         usernameVariable: 'GIT_USERNAME')]) {
+            sh """
+                git config user.email jenkins@ci
+                git config user.name Jenkins
+                git add -A
+                # Değişiklik varsa pushla
+                if ! git diff --cached --quiet; then
+                    # URL'ye token enjekte ediyoruz
+                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/akorhan/hava-durumu-deneyi.git HEAD:master
+                else
+                    echo "Degisiklik yok, push atlandi."
+                fi
+            """
         }
     }
+}
 
     post {
         failure {

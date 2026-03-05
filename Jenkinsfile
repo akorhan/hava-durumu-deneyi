@@ -22,34 +22,32 @@ pipeline {
             }
         }
 
-stage('Push') {
-    steps {
-        // 'github-token' senin Jenkins'e eklediğin credential ID'si olmalı
-        withCredentials([usernamePassword(credentialsId: 'github-token', 
-                         passwordVariable: 'GIT_PASSWORD', 
-                         usernameVariable: 'GIT_USERNAME')]) {
-            sh """
-                git config user.email jenkins@ci
-                git config user.name Jenkins
-                git add -A
-                # Değişiklik varsa pushla
-                if ! git diff --cached --quiet; then
-                    # URL'ye token enjekte ediyoruz
-                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/akorhan/hava-durumu-deneyi.git HEAD:master
-                else
-                    echo "Degisiklik yok, push atlandi."
-                fi
-            """
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-token', 
+                                 passwordVariable: 'GIT_PASSWORD', 
+                                 usernameVariable: 'GIT_USERNAME')]) {
+                    sh """
+                        git config user.email jenkins@ci
+                        git config user.name Jenkins
+                        git add -A
+                        if ! git diff --cached --quiet; then
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/akorhan/hava-durumu-deneyi.git HEAD:master
+                        else
+                            echo "Degisiklik yok, push atlandi."
+                        fi
+                    """
+                }
+            }
         }
-    }
-}
+    } // <--- Stages bloğunu kapatan parantez eksikti, eklendi.
 
     post {
         failure {
-            echo 'Pipeline basarisiz oldu. Push adimi atildi.'
+            echo 'Pipeline basarisiz oldu.'
         }
         success {
             echo 'Pipeline basariyla tamamlandi.'
         }
     }
-}
+} // <--- Pipeline ana bloğunu kapatan parantez eksikti, eklendi.

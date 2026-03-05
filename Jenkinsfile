@@ -29,7 +29,7 @@ pipeline {
                     git config user.name "Jenkins"
                     git add -A
                     git diff --cached --quiet || git commit -m "ci: automated build [skip ci]"
-                    git push origin master
+                    git push origin HEAD:master
                 '''
             }
         }

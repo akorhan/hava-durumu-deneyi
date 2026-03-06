@@ -40,7 +40,7 @@ pipeline {
                 }
             }
         }
-    } // <--- Stages bloğunu kapatan parantez eksikti, eklendi.
+    } 
 
     post {
         failure {
@@ -50,4 +50,4 @@ pipeline {
             echo 'Pipeline basariyla tamamlandi.'
         }
     }
-} // <--- Pipeline ana bloğunu kapatan parantez eksikti, eklendi.
+} 
